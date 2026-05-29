@@ -9,11 +9,11 @@ services:
       - ollama_data:/root/.ollama
     entrypoint: >
       sh -c "
-        ollama serve &
-        sleep 2 &&
-        ollama pull llama3.2 &&
-        ollama pull mxbai-embed-large &&
-        tail -f /dev/null
+      ollama serve &
+      sleep 2 &&
+      ollama pull llama3.2 &&
+      ollama pull mxbai-embed-large &&
+      tail -f /dev/null
       "
     healthcheck:
       test: ["CMD-SHELL", "ollama list"]
@@ -21,31 +21,28 @@ services:
       timeout: 5s
       retries: 5
 
-backend:
-  image: python:3.11-slim
-  working_dir: /app
-  volumes:
-    - .:/app
-  command: sh -c "pip install -r requirements-backend.txt && fastapi dev backend/fastapi/api/main_app.py --host 0.0.0.0 --port 8000"
-  ports:
-    - "8000:8000"
-  environment:
-    - OLLAMA_BASE_URL=http://ollama:11434
-  depends_on:
-    ollama:
-      condition: service_healthy
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+    depends_on:
+      ollama:
+        condition: service_healthy
 
-frontend:
-  image: python:3.11-slim
-  working_dir: /app
-  volumes:
-    - .:/app
-  command: sh -c "pip install -r requirements-frontend.txt && streamlit run frontend/Start_Page.py --server.address 0.0.0.0"
-  ports:
-    - "8501:8501"
-  environment:
-    - BACKEND_URL=http://backend:8000
-  depends_on:
-    - backend
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "8501:8501"
+    environment:
+      - BACKEND_URL=http://backend:8000
+    depends_on:
+      - backend
+
 volumes:
   ollama_data:
