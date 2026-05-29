@@ -1,0 +1,11 @@
+# requirements-backend.txt
+langgraph~=0.6.0
+langchain
+langchain-chroma
+langchain-ollama
+fastapi
+fastapi[standard]
+pydantic~=2.11.7
+python-dotenv
+loguru~=0.7.3
+typing_extensions~=4.14.1

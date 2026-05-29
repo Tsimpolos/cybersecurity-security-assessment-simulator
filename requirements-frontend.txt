@@ -1,0 +1,4 @@
+# requirements-frontend.txt
+streamlit
+requests
+python-dotenv
